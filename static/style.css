@@ -433,3 +433,97 @@ textarea:focus{
   from{ opacity: 0; transform: translateY(14px); }
   to{ opacity: 1; transform: translateY(0); }
 }
+
+
+/* ============================================================
+   START TESTING / SAMPLE SENTENCES
+   ============================================================ */
+.examples-panel{
+  margin-top: 22px;
+  padding: 26px 28px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  background: rgba(255,255,255,0.018);
+  animation: rise 800ms 140ms var(--ease-out) both;
+}
+.examples-intro{
+  display:flex; align-items:center; justify-content:space-between; gap:22px;
+}
+.examples-intro .eyebrow{ margin-bottom:8px; }
+.examples-intro h2{
+  margin:0; font-family:var(--font-display); font-size:clamp(22px,3vw,29px);
+  font-weight:600; letter-spacing:-0.025em;
+}
+.examples-intro p{ margin:7px 0 0; color:var(--text-dim); font-size:13px; line-height:1.5; }
+.btn-secondary{
+  flex-shrink:0; display:inline-flex; align-items:center; gap:12px;
+  padding:11px 17px; border:1px solid var(--border); border-radius:999px;
+  background:rgba(255,255,255,0.04); color:var(--text); font-size:13px;
+  font-weight:600; cursor:pointer; transition:all 220ms var(--ease-out);
+}
+.btn-secondary:hover{ border-color:var(--accent); color:var(--accent); transform:translateY(-1px); }
+.example-list{
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-top:22px;
+}
+.example-card{
+  min-width:0; display:grid; grid-template-columns:34px minmax(0,1fr) 16px;
+  align-items:center; gap:12px; padding:14px; text-align:left;
+  border:1px solid var(--border); border-radius:15px;
+  background:rgba(0,0,0,0.14); color:var(--text); cursor:pointer;
+  transition:transform 200ms var(--ease-out), border-color 200ms, background 200ms;
+}
+.example-card:hover{ transform:translateY(-2px); border-color:var(--accent); background:var(--accent-soft); }
+.example-emoji{ font-size:22px; text-align:center; }
+.example-card strong{ display:block; margin-bottom:4px; font-size:13px; text-transform:capitalize; }
+.example-card small{ display:block; color:var(--text-dim); font-size:12px; line-height:1.45; overflow-wrap:anywhere; }
+.example-arrow{ color:var(--text-faint); font-size:15px; }
+@media(max-width:600px){
+  .examples-panel{ padding:21px 18px; }
+  .examples-intro{ align-items:flex-start; flex-direction:column; }
+  .example-list{ grid-template-columns:1fr; }
+  .btn-secondary{ align-self:flex-start; }
+}
+
+/* ============================================================
+   SMOOTHER RESULT REVEAL
+   ============================================================ */
+.result.entering .reveal,
+.result.entering .breakdown{
+  animation: result-card-in 720ms cubic-bezier(.2,.75,.25,1) both;
+}
+.result.entering .breakdown{ animation-delay: 110ms; }
+.result.entering .reveal-emoji{ animation: emotion-pop 620ms cubic-bezier(.18,.85,.25,1.25) 120ms both; }
+.result.entering #emotionWord{ animation: word-settle 650ms cubic-bezier(.2,.75,.25,1) 170ms both; }
+.result.entering .confidence-mono{ animation: fade-up 520ms ease-out 250ms both; }
+.result.entering .echoed-text{ animation: fade-up 560ms ease-out 310ms both; }
+.bar-row{ animation: bar-row-in 420ms ease-out both; animation-delay: calc(200ms + var(--row-index, 0) * 75ms); }
+.bar-fill{ transition: width 850ms cubic-bezier(.2,.75,.25,1); }
+
+@keyframes result-card-in{
+  from{ opacity:0; transform:translateY(18px) scale(.985); filter:blur(4px); }
+  to{ opacity:1; transform:translateY(0) scale(1); filter:blur(0); }
+}
+@keyframes emotion-pop{
+  0%{ opacity:0; transform:translateY(10px) scale(.72) rotate(-8deg); }
+  68%{ opacity:1; transform:translateY(-3px) scale(1.12) rotate(3deg); }
+  100%{ opacity:1; transform:translateY(0) scale(1) rotate(0); }
+}
+@keyframes word-settle{
+  from{ opacity:0; transform:translateX(10px); letter-spacing:.04em; }
+  to{ opacity:1; transform:translateX(0); letter-spacing:-.01em; }
+}
+@keyframes fade-up{
+  from{ opacity:0; transform:translateY(7px); }
+  to{ opacity:1; transform:translateY(0); }
+}
+@keyframes bar-row-in{
+  from{ opacity:0; transform:translateX(9px); }
+  to{ opacity:1; transform:translateX(0); }
+}
+@media (prefers-reduced-motion: reduce){
+  .result.entering .reveal, .result.entering .breakdown,
+  .result.entering .reveal-emoji, .result.entering #emotionWord,
+  .result.entering .confidence-mono, .result.entering .echoed-text,
+  .bar-row{ animation:none !important; }
+}
+

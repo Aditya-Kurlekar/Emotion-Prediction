@@ -25,6 +25,8 @@
     confidenceText: document.getElementById("confidenceText"),
     echoedText: document.getElementById("echoedText"),
     barsContainer: document.getElementById("barsContainer"),
+    startExamplesBtn: document.getElementById("startExamplesBtn"),
+    exampleList: document.getElementById("exampleList"),
   };
 
   let modelReady = false;
@@ -78,6 +80,30 @@
   }
 
   el.analyzeBtn.addEventListener("click", runAnalysis);
+
+  // Reveal sample sentences when the user chooses to start testing.
+  el.startExamplesBtn.addEventListener("click", () => {
+    const isOpen = !el.exampleList.hidden;
+    el.exampleList.hidden = isOpen;
+    el.startExamplesBtn.setAttribute("aria-expanded", String(!isOpen));
+    el.startExamplesBtn.innerHTML = isOpen
+      ? 'Start testing <span aria-hidden="true">→</span>'
+      : 'Hide examples <span aria-hidden="true">↑</span>';
+    if (!isOpen) {
+      el.exampleList.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  });
+
+  // Choosing a sample fills the input; the user still presses Read the mood.
+  el.exampleList.addEventListener("click", (event) => {
+    const card = event.target.closest(".example-card");
+    if (!card) return;
+    el.textInput.value = card.dataset.sentence || "";
+    el.charCount.textContent = el.textInput.value.length;
+    syncButtonState();
+    el.textInput.focus();
+    el.textInput.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
 
   /* ---------------------------------------------------------------
      Analysis flow
@@ -148,17 +174,22 @@
 
     el.emotionWord.textContent = capitalize(emotion);
     el.emotionEmoji.textContent = emoji;
-    el.confidenceText.textContent = `${(data.confidence * 100).toFixed(1)}% confidence`;
+    el.confidenceText.textContent = "0.0% confidence";
     el.echoedText.textContent = `“${originalText}”`;
 
     renderBars(data.all_probabilites);
 
     el.resultSection.hidden = false;
     el.resultSection.classList.remove("entering");
-    void el.resultSection.offsetWidth; // restart animation
+    void el.resultSection.offsetWidth; // restart animation on every prediction
     el.resultSection.classList.add("entering");
+    el.resultSection.setAttribute("aria-label", `Detected emotion: ${capitalize(emotion)}`);
 
-    el.resultSection.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    animateNumber(0, data.confidence * 100, 850, (value) => {
+      el.confidenceText.textContent = `${value.toFixed(1)}% confidence`;
+    }, 160);
+
+    el.resultSection.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "nearest" });
   }
 
   function renderBars(probs) {
@@ -169,18 +200,47 @@
       const pct = value * 100;
       const row = document.createElement("div");
       row.className = `bar-row bar-${label}`;
+      row.style.setProperty("--row-index", i);
       row.innerHTML = `
         <span class="bar-label">${EMOJI[label] || ""} ${label}</span>
-        <span class="bar-track"><span class="bar-fill"></span></span>
-        <span class="bar-pct">${pct.toFixed(1)}%</span>
+        <span class="bar-track" role="progressbar" aria-label="${label} probability" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct.toFixed(1)}"><span class="bar-fill"></span></span>
+        <span class="bar-pct">0.0%</span>
       `;
       el.barsContainer.appendChild(row);
 
       const fill = row.querySelector(".bar-fill");
+      const pctLabel = row.querySelector(".bar-pct");
+      const delay = prefersReducedMotion() ? 0 : 240 + i * 95;
       setTimeout(() => {
         fill.style.width = pct + "%";
-      }, 60 + i * 70);
+        animateNumber(0, pct, 760, (number) => {
+          pctLabel.textContent = `${number.toFixed(1)}%`;
+        });
+      }, delay);
     });
+  }
+
+  function animateNumber(from, to, duration, onUpdate, delay = 0) {
+    if (prefersReducedMotion()) {
+      onUpdate(to);
+      return;
+    }
+    const start = performance.now() + delay;
+    const tick = (now) => {
+      if (now < start) {
+        requestAnimationFrame(tick);
+        return;
+      }
+      const progress = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      onUpdate(from + (to - from) * eased);
+      if (progress < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  function prefersReducedMotion() {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }
 
   function showError(msg) {

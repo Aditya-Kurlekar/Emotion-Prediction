@@ -10,12 +10,17 @@ from keras.models import load_model
 import numpy as np
 import pickle
 import re
+from pathlib import Path
+
+
+# Base directory of the project
+BASE_DIR = Path(__file__).resolve().parent
 
 #A. Model Path (BiGRU)
-model_path = "Artifacts/BiGRU_Model.keras"
+model_path = BASE_DIR / "Artifacts" / "BiGRU_Modle.keras"
 
 #B. Tokenizer Path
-tokenizer_path = "Artifacts/tokenizer.pkl"
+tokenizer_path = BASE_DIR / "Artifacts" / "tokenizer.pkl"
 
 #C. Max Sequence Length
 max_sequence_length = 50
@@ -48,21 +53,23 @@ class TextInput(BaseModel):
         min_length=1,
         max_length=2000,
         description="The sentence to analyze",
-        json_schema_extra={"example": "I feel so happy and excited"}
+        json_schema_extra={
+            "example": "I feel so happy and excited"
+            }
         )
 
-    class PredictionResponse(BaseModel):
+class PredictionResponse(BaseModel):
         text: str
-    predicted_emotion: str
-    confidence : float
-    all_probabilites: dict[str, float]
+        predicted_emotion: str
+        confidence : float
+        all_probabilites: dict[str, float]
 
-    class HealthResponse(BaseModel):
+class HealthResponse(BaseModel):
         status: str
-    model_loaded: bool
+        model_loaded: bool
 
-    # Model Loading and LifeSpan Management
-    dl_model = {} 
+# Model Loading and LifeSpan Management
+dl_model = {} 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

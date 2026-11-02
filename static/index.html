@@ -58,7 +58,28 @@
 
     </section>
 
-    <section class="result" id="resultSection" hidden>
+    <section class="examples-panel" aria-labelledby="examplesHeading">
+      <div class="examples-intro">
+        <div>
+          <span class="eyebrow">NEW TO MOODLINE?</span>
+          <h2 id="examplesHeading">Try a few example sentences</h2>
+          <p>Start with a sample, then let Moodline predict its emotion.</p>
+        </div>
+        <button id="startExamplesBtn" class="btn-secondary" type="button" aria-expanded="false" aria-controls="exampleList">
+          Start testing <span aria-hidden="true">→</span>
+        </button>
+      </div>
+      <div class="example-list" id="exampleList" hidden>
+        <button class="example-card" type="button" data-sentence="I feel so happy and excited today!"><span class="example-emoji">😄</span><span><strong>Joy</strong><small>I feel so happy and excited today!</small></span><span class="example-arrow">↗</span></button>
+        <button class="example-card" type="button" data-sentence="I feel deeply loved by my family."><span class="example-emoji">❤️</span><span><strong>Love</strong><small>I feel deeply loved by my family.</small></span><span class="example-arrow">↗</span></button>
+        <button class="example-card" type="button" data-sentence="I am furious about what happened."><span class="example-emoji">😠</span><span><strong>Anger</strong><small>I am furious about what happened.</small></span><span class="example-arrow">↗</span></button>
+        <button class="example-card" type="button" data-sentence="I am frightened about tomorrow."><span class="example-emoji">😨</span><span><strong>Fear</strong><small>I am frightened about tomorrow.</small></span><span class="example-arrow">↗</span></button>
+        <button class="example-card" type="button" data-sentence="I feel sad and lonely today."><span class="example-emoji">😢</span><span><strong>Sadness</strong><small>I feel sad and lonely today.</small></span><span class="example-arrow">↗</span></button>
+        <button class="example-card" type="button" data-sentence="Wow, I never expected this amazing surprise!"><span class="example-emoji">😲</span><span><strong>Surprise</strong><small>Wow, I never expected this amazing surprise!</small></span><span class="example-arrow">↗</span></button>
+      </div>
+    </section>
+
+    <section class="result" id="resultSection" aria-live="polite" aria-atomic="false" hidden>
 
       <div class="reveal">
         <span class="eyebrow">DETECTED</span>
